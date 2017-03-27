@@ -1,7 +1,7 @@
 # eigenface
 
-Authors
-#
+Authors:
+
 John Guibas
-#
+
 Tejpal Virdi
