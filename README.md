@@ -1,7 +1,7 @@
 # eigenface
 
-Authors:
+Authors
 
-John Guibas
+John Guibas (jtgg01@gmail.com)
 
-Tejpal Virdi
+Tejpal Virdi (tejpalv8@gmail.com)
