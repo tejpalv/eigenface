@@ -5,10 +5,13 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 public class eigenfaces {
+	// image name 1.pgm to 7.pgm
 	static int start = 1;
 	static int end = 7;
-	static int width = 140;
+	// dimensions of image:
+	static int width = 140; 
 	static int height = 198;
+	
 	public static void main(String[] args) {
 		
 		double[][] faces = new double[end][width * height]; //matrix of faces in the form of column vectors of n^2 x 1
@@ -22,49 +25,31 @@ public class eigenfaces {
 				}
 	}
 		double[] average = average(faces); //computes average 
-		
-		// Average face:
-		
+				
 		double[][] twoDdoubles = columnTo2D(average (faces));
 		
 		
-		
-
-
-		
-		
-		double[][] facesMinusAverage = facesMinusAverage(faces, average);
-		
-		//writePGM(convertToIntArr(facesMinusAverage));
-		
+		double[][] facesMinusAverage = facesMinusAverage(faces, average);		
 		
 		double[][] innerProduct = getInnerProduct(facesMinusAverage);
-		
 		
 			Matrix INNERPRODUCT = new Matrix(innerProduct);
 			
 		    EigenvalueDecomposition eig = INNERPRODUCT.eig();
-		    //System.out.println(Arrays.deepToString(eig.getV().getArray()));
 		    Matrix A = new Matrix(facesMinusAverage); 
 		    A = A.transpose(); // how i implemented it puts A in the wrong orientation (transpose)
 			double[][] eigenvectors = eig.getV().getArray();
-//			double[][] oneVector = new double[eigenvectors.length][eigenvectors.length];
-//			
-//				for(int i = 0; i < eigenvectors.length; i++){
-//					for(int j=0; j<eigenvectors.length; j++){
-//						oneVector[j][i] = eigenvectors[j][i]; // moving eigenvectors to single row vector
-//					}
-//				}
-//
-//				
-			// eigenvectors is of matrix L
+			double[][] oneVector = new double[eigenvectors.length][eigenvectors.length];
+			
+				for(int i = 0; i < eigenvectors.length; i++){
+					for(int j=0; j<eigenvectors.length; j++){
+						oneVector[j][i] = eigenvectors[j][i]; // moving eigenvectors to single row vector
+					}
+				}
 
-				
 			Matrix singleVECTOR = new Matrix(eigenvectors);
-//			singleVECTOR = singleVECTOR.transpose(); // oneVector transposed
-			
-			//writePGM(convertToIntArr(singleVECTOR.getArray()));
-			
+			singleVECTOR = singleVECTOR.transpose(); // oneVector transposed
+		
 			Matrix tempVECTOR = A.times(singleVECTOR); // eigenvectors multiplied by tranpose
 
 			double[][] fff = tempVECTOR.getArray();
@@ -76,9 +61,6 @@ public class eigenfaces {
 				}
 			}
 			
-			 //eigenface:
-			//writePGM(zzz);
-			
 			tempVECTOR = tempVECTOR.transpose();
 			
 			double[][] weights = new double[faces.length][faces.length];
@@ -87,51 +69,48 @@ public class eigenfaces {
 			
 			
 			// Ω = U^T(Γ−Ψ)
-//			for(int i=0 ; i<faces.length ; i++){
-				// 7x27720 * 27720x1
-				//weights = multiply(tempVECTOR.getArray() , facesMinusAverage[i]);
+			for(int i=0 ; i<faces.length ; i++){
 				prom[0] = facesMinusAverage[3];
 				Matrix pro = new Matrix(prom);
 				pro = pro.transpose();
 				weights = tempVECTOR.times(pro).getArray();
 				
-//			}
+			}
 
-			//System.out.println(Arrays.deepToString(tempVECTOR.getArray()));
-
-//			
-			// reconstruct:
-//			for(int i=0; i<faces.length;i++){
-//				
-//				for(int j=0;j<faces[0].length;j++){
-//					faces[i][j] = weights[i][0] * faces[i][j];
-//				}
-//			}
-//			int[][] p = convertToIntArr(faces);
-			//writePGM(p);
+		
+			 //reconstruct:
+			for(int i=0; i<faces.length;i++){
+				
+				for(int j=0;j<faces[0].length;j++){
+					faces[i][j] = weights[i][0] * faces[i][j];
+				}
+			}
+			int[][] p = convertToIntArr(faces);
 			
-				
-				
-				
+			// empty image:
+			int[][] blank = new int[27720][1]; 
+						
+			// RENDERING:
+			
+			//reset:
+			//writePGM(blank);
 				
 			//Weights:
 			System.out.println(Arrays.deepToString(weights));
 
-
-			//Average:
+			//Average Face:
 			//writePGM(convertToIntArr(twoDdoubles));
 			
-			//Prominent Part:
+			//Prominent Parts Face:
 			//writePGM(convertToIntArr(facesMinusAverage));
 			
 			//Eigenface:
 			//writePGM(zzz);
 			
-			
-				
+			//Reconstruction:
+			//writePGM(p);
 			
 	}
-
 
 private static double[][] getInnerProduct(double[][] facesMinusAverage) {
 		// TODO Auto-generated method stub
@@ -147,18 +126,6 @@ private static double[][] getInnerProduct(double[][] facesMinusAverage) {
 		}
 	}
 	return innerProduct;
-		
-	}
-
-
-	private static double[] subtract(double[] average, double[] ds) {
-		// TODO Auto-generated method stub
-		double[] subtracted = new double[average.length];
-		for(int i=0; i<average.length;i++){
-			subtracted[i] = average[i] - ds[i];
-		}
-		
-		return subtracted;
 	}
 
 
@@ -207,16 +174,14 @@ private static double[][] getInnerProduct(double[][] facesMinusAverage) {
 				zeta[j][i] = vector[j * 140 + i];
 			}
 		}
-		
 		return zeta;
-		
 	}
 	
 	public static double[][] facesMinusAverage(double[][] faces, double[] average){
 		double[][] facesMinusAverage = faces;
 		for(int i = start; i <= end; i++){
 			for(int j = 0; j < (width * height); j++){
-				facesMinusAverage[i-1][j] =  facesMinusAverage[i-1][j] - (average[j]) +50
+				facesMinusAverage[i-1][j] =  facesMinusAverage[i-1][j] - (average[j]) -20;
 						;
 				if(facesMinusAverage[i-1][j] < 0){
 					facesMinusAverage[i-1][j] = 0;
@@ -240,9 +205,7 @@ private static double[][] getInnerProduct(double[][] facesMinusAverage) {
 		            out.flush();
 		            }
 		            
-		        } 
-		     
-		     
+		        }
 		     
 		     }
 		catch (Exception e){
@@ -251,11 +214,4 @@ private static double[][] getInnerProduct(double[][] facesMinusAverage) {
 		
 	}
 	
-	
-	
-	
 	}
-	
-	
-
-
